@@ -1,255 +1,156 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <iomanip>
 using namespace std;
 
-class Vehicle {
+class Employee {
 private:
-    string id;
-    string brand;
-    double pricePerDay;
+    string cccd;
+    string phone;
+    string address;
 
 public:
-    Vehicle() {
-        id = "";
-        brand = "";
-        pricePerDay = 0;
+    Employee() {
+        cccd = "";
+        phone = "";
+        address = "";
     }
 
-    Vehicle(string id, string brand, double pricePerDay) {
-        this->id = id;
-        this->brand = brand;
-        this->pricePerDay = pricePerDay;
+    Employee(string c, string p, string a) {
+        cccd = c;
+        phone = p;
+        address = a;
     }
 
-    string getId() {
-        return id;
-    }
-
-    void setId(string id) {
-        this->id = id;
-    }
-
-    string getBrand() {
-        return brand;
-    }
-
-    void setBrand(string brand) {
-        this->brand = brand;
-    }
-
-    double getPricePerDay() {
-        return pricePerDay;
-    }
-
-    void setPricePerDay(double pricePerDay) {
-        this->pricePerDay = pricePerDay;
-    }
+    virtual double calculateSalary(int month, int year) = 0;
 
     virtual void displayInfo() {
-        cout << "ID: " << id << endl;
-        cout << "Brand: " << brand << endl;
-        cout << "Price per day: " << pricePerDay << endl;
+        cout << "CCCD: " << cccd << endl;
+        cout << "Phone: " << phone << endl;
+        cout << "Address: " << address << endl;
     }
 
-    virtual double calculateRentalFee(int days) {
-        return days * pricePerDay;
-    }
-
-    virtual ~Vehicle() = default;
+    virtual ~Employee() = default;
 };
 
-class Car : public Vehicle {
+class HourlyEmployee : public Employee {
 private:
-    int seats;
+    int hours;
+    double salaryPerHour;
+    int month, year;
 
 public:
-    Car() : Vehicle() {
-        seats = 0;
+    HourlyEmployee() : Employee() {
+        hours = 0;
+        salaryPerHour = 0;
+        month = 0;
+        year = 0;
     }
 
-    Car(string id, string brand, double pricePerDay, int seats)
-        : Vehicle(id, brand, pricePerDay) {
-        this->seats = seats;
+    HourlyEmployee(string c, string p, string a,
+                   int h, double s, int m, int y)
+        : Employee(c, p, a) {
+        hours = h;
+        salaryPerHour = s;
+        month = m;
+        year = y;
     }
 
-    int getSeats() {
-        return seats;
-    }
-
-    void setSeats(int seats) {
-        this->seats = seats;
-    }
-
-    void displayInfo() override {
-        cout << "Type: Car" << endl;
-        Vehicle::displayInfo();
-        cout << "Seats: " << seats << endl;
-    }
-
-    double calculateRentalFee(int days) override {
-        double fee = days * getPricePerDay();
-
-        if (days >= 7) {
-            fee *= 0.9;
-        }
-
-        return fee;
-    }
-};
-
-class Motorbike : public Vehicle {
-private:
-    int engineCapacity;
-
-public:
-    Motorbike() : Vehicle() {
-        engineCapacity = 0;
-    }
-
-    Motorbike(string id, string brand, double pricePerDay,
-              int engineCapacity)
-        : Vehicle(id, brand, pricePerDay) {
-        this->engineCapacity = engineCapacity;
-    }
-
-    int getEngineCapacity() {
-        return engineCapacity;
-    }
-
-    void setEngineCapacity(int engineCapacity) {
-        this->engineCapacity = engineCapacity;
-    }
-
-    void displayInfo() override {
-        cout << "Type: Motorbike" << endl;
-        Vehicle::displayInfo();
-        cout << "Engine capacity: " << engineCapacity << " cc" << endl;
-    }
-
-    double calculateRentalFee(int days) override {
-        double fee = days * getPricePerDay();
-
-        if (days >= 5) {
-            fee *= 0.95;
-        }
-
-        return fee;
-    }
-};
-
-class Truck : public Vehicle {
-private:
-    double transportFee;
-    double loadCapacity;
-
-public:
-    Truck() : Vehicle() {
-        transportFee = 0;
-        loadCapacity = 0;
-    }
-
-    Truck(string id, string brand, double pricePerDay,
-          double transportFee, double loadCapacity)
-        : Vehicle(id, brand, pricePerDay) {
-        this->transportFee = transportFee;
-        this->loadCapacity = loadCapacity;
-    }
-
-    double getTransportFee() {
-        return transportFee;
-    }
-
-    void setTransportFee(double transportFee) {
-        this->transportFee = transportFee;
-    }
-
-    double getLoadCapacity() {
-        return loadCapacity;
-    }
-
-    void setLoadCapacity(double loadCapacity) {
-        this->loadCapacity = loadCapacity;
-    }
-
-    void displayInfo() override {
-        cout << "Type: Truck" << endl;
-        Vehicle::displayInfo();
-        cout << "Transport fee: " << transportFee << endl;
-        cout << "Load capacity: " << loadCapacity << " tons" << endl;
-    }
-
-    double calculateRentalFee(int days) override {
-        return days * getPricePerDay() + transportFee;
-    }
-};
-
-int main() {
-    vector<Vehicle*> vehicles;
-
-    vehicles.push_back(new Car("C01", "Toyota", 1000000, 7));
-    vehicles.push_back(new Car("C02", "Honda", 800000, 5));
-    vehicles.push_back(new Motorbike("M01", "Honda", 150000, 150));
-    vehicles.push_back(new Motorbike("M02", "Yamaha", 120000, 125));
-    vehicles.push_back(new Truck("T01", "Hyundai", 2000000, 500000, 5));
-    vehicles.push_back(new Truck("T02", "Isuzu", 2500000, 700000, 10));
-
-    int days;
-    cout << "Enter rental days: ";
-    cin >> days;
-
-    if (days <= 0) {
-        cout << "Rental days must be greater than 0." << endl;
-
-        for (Vehicle* v : vehicles) {
-            delete v;
-        }
+    double calculateSalary(int m, int y) override {
+        if (m == month && y == year)
+            return hours * salaryPerHour;
 
         return 0;
     }
+};
 
-    double totalRevenue = 0;
-    double maxFee = -1;
-    Vehicle* mostExpensive = nullptr;
+class MonthlyEmployee : public Employee {
+private:
+    double monthlySalary;
+    int month, year;
 
-    cout << fixed << setprecision(0);
+public:
+    MonthlyEmployee(string c, string p, string a,
+                    double s, int m, int y)
+        : Employee(c, p, a) {
+        monthlySalary = s;
+        month = m;
+        year = y;
+    }
 
-    for (Vehicle* v : vehicles) {
-        cout << "\n====================" << endl;
-        v->displayInfo();
+    double calculateSalary(int m, int y) override {
+        if (m == month && y == year)
+            return monthlySalary;
 
-        double fee = v->calculateRentalFee(days);
+        return 0;
+    }
+};
 
-        cout << "Rental days: " << days << endl;
-        cout << "Rental fee: " << fee << " VND" << endl;
+class DailyEmployee : public Employee {
+private:
+    int numberOfDays;
+    double salaryPerDay;
+    int month, year;
 
-        totalRevenue += fee;
+public:
+    DailyEmployee(string c, string p, string a,
+                  int d, double s, int m, int y)
+        : Employee(c, p, a) {
+        numberOfDays = d;
+        salaryPerDay = s;
+        month = m;
+        year = y;
+    }
 
-        if (fee > maxFee) {
-            maxFee = fee;
-            mostExpensive = v;
+    double calculateSalary(int m, int y) override {
+        if (m == month && y == year)
+            return numberOfDays * salaryPerDay;
+
+        return 0;
+    }
+};
+
+double calculateYearlySalary(Employee* employees[],
+                             int size, int year) {
+    double total = 0;
+
+    for (int i = 0; i < size; i++) {
+        for (int month = 1; month <= 12; month++) {
+            total += employees[i]->calculateSalary(month, year);
         }
     }
 
-    cout << "\n====================" << endl;
-    cout << "Total rental revenue: "
-         << totalRevenue << " VND" << endl;
+    return total;
+}
 
-    cout << "\nVehicle with the highest rental fee:" << endl;
+int main() {
+    HourlyEmployee h(
+        "001", "0901", "HCM",
+        160, 50000, 10, 2026
+    );
 
-    if (mostExpensive != nullptr) {
-        mostExpensive->displayInfo();
-        cout << "Highest rental fee: "
-             << maxFee << " VND" << endl;
+    MonthlyEmployee m(
+        "002", "0902", "Dong Nai",
+        15000000, 10, 2026
+    );
+
+    DailyEmployee d(
+        "003", "0903", "Ha Noi",
+        22, 400000, 10, 2026
+    );
+
+    Employee* employees[] = {&h, &m, &d};
+    int size = 3;
+
+    cout << "Monthly salaries:" << endl;
+
+    for (Employee* e : employees) {
+        cout << e->calculateSalary(10, 2026) << endl;
     }
 
-    for (Vehicle* v : vehicles) {
-        delete v;
-    }
-
-    vehicles.clear();
+    cout << "Total yearly salary in 2026: "
+         << calculateYearlySalary(employees, size, 2026)
+         << endl;
 
     return 0;
 }
