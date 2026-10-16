@@ -5,103 +5,251 @@
 #include <iomanip>
 using namespace std;
 
-class Product {
+class Vehicle {
 private:
-    string name;
-    double revenue;
-    int day, month, year;
+    string id;
+    string brand;
+    double pricePerDay;
 
 public:
-    Product() {
-        name = "";
-        revenue = 0;
-        day = month = year = 0;
+    Vehicle() {
+        id = "";
+        brand = "";
+        pricePerDay = 0;
     }
 
-    Product(string n, double r, int d, int m, int y) {
-        name = n;
-        revenue = r;
-        day = d;
-        month = m;
-        year = y;
+    Vehicle(string id, string brand, double pricePerDay) {
+        this->id = id;
+        this->brand = brand;
+        this->pricePerDay = pricePerDay;
     }
 
-    string getName() {
-        return name;
+    string getId() {
+        return id;
     }
 
-    double getRevenue(int d, int m, int y) {
-        if (day == d && month == m && year == y)
-            return revenue;
-        return 0;
+    void setId(string id) {
+        this->id = id;
+    }
+
+    string getBrand() {
+        return brand;
+    }
+
+    void setBrand(string brand) {
+        this->brand = brand;
+    }
+
+    double getPricePerDay() {
+        return pricePerDay;
+    }
+
+    void setPricePerDay(double pricePerDay) {
+        this->pricePerDay = pricePerDay;
     }
 
     virtual void displayInfo() {
-        cout << name << ": " << revenue << endl;
+        cout << "ID: " << id << endl;
+        cout << "Brand: " << brand << endl;
+        cout << "Price per day: " << pricePerDay << endl;
     }
 
-    virtual ~Product() = default;
-};
-
-class Drinks : public Product {
-public:
-    Drinks(string n, double r, int d, int m, int y)
-        : Product(n, r, d, m, y) {}
-};
-
-class Foods : public Product {
-public:
-    Foods(string n, double r, int d, int m, int y)
-        : Product(n, r, d, m, y) {}
-};
-
-double calculateRevenue(Product* products[], int size,
-                        int d, int m, int y) {
-    double total = 0;
-
-    for (int i = 0; i < size; i++) {
-        total += products[i]->getRevenue(d, m, y);
+    virtual double calculateRentalFee(int days) {
+        return days * pricePerDay;
     }
 
-    return total;
-}
+    virtual ~Vehicle() = default;
+};
+
+class Car : public Vehicle {
+private:
+    int seats;
+
+public:
+    Car() : Vehicle() {
+        seats = 0;
+    }
+
+    Car(string id, string brand, double pricePerDay, int seats)
+        : Vehicle(id, brand, pricePerDay) {
+        this->seats = seats;
+    }
+
+    int getSeats() {
+        return seats;
+    }
+
+    void setSeats(int seats) {
+        this->seats = seats;
+    }
+
+    void displayInfo() override {
+        cout << "Type: Car" << endl;
+        Vehicle::displayInfo();
+        cout << "Seats: " << seats << endl;
+    }
+
+    double calculateRentalFee(int days) override {
+        double fee = days * getPricePerDay();
+
+        if (days >= 7) {
+            fee *= 0.9;
+        }
+
+        return fee;
+    }
+};
+
+class Motorbike : public Vehicle {
+private:
+    int engineCapacity;
+
+public:
+    Motorbike() : Vehicle() {
+        engineCapacity = 0;
+    }
+
+    Motorbike(string id, string brand, double pricePerDay,
+              int engineCapacity)
+        : Vehicle(id, brand, pricePerDay) {
+        this->engineCapacity = engineCapacity;
+    }
+
+    int getEngineCapacity() {
+        return engineCapacity;
+    }
+
+    void setEngineCapacity(int engineCapacity) {
+        this->engineCapacity = engineCapacity;
+    }
+
+    void displayInfo() override {
+        cout << "Type: Motorbike" << endl;
+        Vehicle::displayInfo();
+        cout << "Engine capacity: " << engineCapacity << " cc" << endl;
+    }
+
+    double calculateRentalFee(int days) override {
+        double fee = days * getPricePerDay();
+
+        if (days >= 5) {
+            fee *= 0.95;
+        }
+
+        return fee;
+    }
+};
+
+class Truck : public Vehicle {
+private:
+    double transportFee;
+    double loadCapacity;
+
+public:
+    Truck() : Vehicle() {
+        transportFee = 0;
+        loadCapacity = 0;
+    }
+
+    Truck(string id, string brand, double pricePerDay,
+          double transportFee, double loadCapacity)
+        : Vehicle(id, brand, pricePerDay) {
+        this->transportFee = transportFee;
+        this->loadCapacity = loadCapacity;
+    }
+
+    double getTransportFee() {
+        return transportFee;
+    }
+
+    void setTransportFee(double transportFee) {
+        this->transportFee = transportFee;
+    }
+
+    double getLoadCapacity() {
+        return loadCapacity;
+    }
+
+    void setLoadCapacity(double loadCapacity) {
+        this->loadCapacity = loadCapacity;
+    }
+
+    void displayInfo() override {
+        cout << "Type: Truck" << endl;
+        Vehicle::displayInfo();
+        cout << "Transport fee: " << transportFee << endl;
+        cout << "Load capacity: " << loadCapacity << " tons" << endl;
+    }
+
+    double calculateRentalFee(int days) override {
+        return days * getPricePerDay() + transportFee;
+    }
+};
 
 int main() {
-    Drinks coffee("Coffee", 1500000, 16, 10, 2026);
-    Drinks tea("Tea", 800000, 16, 10, 2026);
-    Drinks smoothies("Smoothies", 1200000, 16, 10, 2026);
-    Drinks juices("Juices", 600000, 15, 10, 2026);
+    vector<Vehicle*> vehicles;
 
-    Foods cake("Cake", 900000, 16, 10, 2026);
-    Foods breads("Breads", 500000, 16, 10, 2026);
+    vehicles.push_back(new Car("C01", "Toyota", 1000000, 7));
+    vehicles.push_back(new Car("C02", "Honda", 800000, 5));
+    vehicles.push_back(new Motorbike("M01", "Honda", 150000, 150));
+    vehicles.push_back(new Motorbike("M02", "Yamaha", 120000, 125));
+    vehicles.push_back(new Truck("T01", "Hyundai", 2000000, 500000, 5));
+    vehicles.push_back(new Truck("T02", "Isuzu", 2500000, 700000, 10));
 
-    Product* drinks[] = {
-        &coffee, &tea, &smoothies, &juices
-    };
+    int days;
+    cout << "Enter rental days: ";
+    cin >> days;
 
-    Product* foods[] = {
-        &cake, &breads
-    };
+    if (days <= 0) {
+        cout << "Rental days must be greater than 0." << endl;
 
-    int d, m, y;
+        for (Vehicle* v : vehicles) {
+            delete v;
+        }
 
-    cout << "Enter date (dd mm yyyy): ";
-    cin >> d >> m >> y;
+        return 0;
+    }
+
+    double totalRevenue = 0;
+    double maxFee = -1;
+    Vehicle* mostExpensive = nullptr;
 
     cout << fixed << setprecision(0);
 
-    cout << "\nRevenue on "
-         << setfill('0') << setw(2) << d << "/"
-         << setw(2) << m << "/"
-         << y << setfill(' ') << endl;
+    for (Vehicle* v : vehicles) {
+        cout << "\n====================" << endl;
+        v->displayInfo();
 
-    cout << "Drinks: "
-         << calculateRevenue(drinks, 4, d, m, y)
-         << " VND" << endl;
+        double fee = v->calculateRentalFee(days);
 
-    cout << "Foods: "
-         << calculateRevenue(foods, 2, d, m, y)
-         << " VND" << endl;
+        cout << "Rental days: " << days << endl;
+        cout << "Rental fee: " << fee << " VND" << endl;
+
+        totalRevenue += fee;
+
+        if (fee > maxFee) {
+            maxFee = fee;
+            mostExpensive = v;
+        }
+    }
+
+    cout << "\n====================" << endl;
+    cout << "Total rental revenue: "
+         << totalRevenue << " VND" << endl;
+
+    cout << "\nVehicle with the highest rental fee:" << endl;
+
+    if (mostExpensive != nullptr) {
+        mostExpensive->displayInfo();
+        cout << "Highest rental fee: "
+             << maxFee << " VND" << endl;
+    }
+
+    for (Vehicle* v : vehicles) {
+        delete v;
+    }
+
+    vehicles.clear();
 
     return 0;
 }
